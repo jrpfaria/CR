@@ -28,8 +28,8 @@ void DistanceSquaredSw(unsigned int* pDst, Coordinate* pSrc, unsigned int size)
     for (unsigned int i = 0; i < size; i++)
     {
         Coordinate* index = pSrc + i * 2;
-        unsigned int dx = (index + 1)->x - index->x;
-        unsigned int dy = (index + 1)->y - index->y;
+        int dx = (index + 1)->x - index->x;
+        int dy = (index + 1)->y - index->y;
         pDst[i] = dx * dx + dy * dy;
     }
 }
