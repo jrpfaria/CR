@@ -41,10 +41,14 @@ void DistanceSquaredHw(unsigned int* pDst, Coordinate* pSrc, unsigned int size)
 
     for (p = pSrc; p < pSrc + size; p+=2, pDst++)
     {
-        *compacted_bytes = p->x               // x1 = S_AXIS_TDATA(7 downto 0)
-						| (p->y << 8)         // y1 = S_AXIS_TDATA(15 downto 8)
-						| ((p+1)->x << 16)    // x2 = S_AXIS_TDATA(23 downto 16)
-						| ((p+1)->y << 24);   // y2 = S_AXIS_TDATA(31 downto 24)
+        // Operation to compact the coordinates into a single 32-bit word
+        // this is done this way because Coordinates store 8-bit values
+        // which means that they can't be shifted more than 8 bits, therefore
+        // we can't shift those 8 bits to the left and then OR them with the next value
+        *compacted_bytes = (p+1)-y;                             // y2 = S_AXIS_TDATA(31 downto 24)                  
+        *compacted_bytes = (*compacted_bytes << 8) | (p+1)->x;  // x2 = S_AXIS_TDATA(23 downto 16)
+        *compacted_bytes = (*compacted_bytes << 8) | p->y;      // y1 = S_AXIS_TDATA(15 downto 8)
+        *compacted_bytes = (*compacted_bytes << 8) | p->x;      // x1 = S_AXIS_TDATA(7 downto 0)  
         putfslx(*compacted_bytes, 0, FSL_DEFAULT);
         getfslx(*pDst, 0, FSL_DEFAULT);
     }
